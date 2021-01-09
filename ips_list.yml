@@ -21,7 +21,8 @@ common_cells:
   commit: v1.20.0
   domain: [cluster, soc]
 L2_tcdm_hybrid_interco:
-  commit: pulpissimo-v1.0
+#  commit: pulpissimo-v1.0
+  commit: dift-ext
   group: jsailer
   domain: [soc]
 cluster_interconnect:
@@ -49,7 +50,9 @@ apb_interrupt_cntrl:
   commit: v0.0.1
   domain: [soc]
 axi/axi:
-  commit: v0.24.1
+#  commit: v0.24.1
+  commit: wa-vsim-10.6c
+  group: jsailer
   domain: [cluster, soc]
 # axi/axi_node:
 #   commit: v1.1.4
@@ -69,22 +72,27 @@ fpnew:
 jtag_pulp:
   commit: v0.1
   domain: [soc]
-riscv:
-  commit: pulpissimo-v3.4.0
+#riscv:
+#  commit: pulpissimo-v3.4.0
+cv32e40p:
+  commit: dift-ext
+  group: jsailer
   domain: [cluster, soc]
 ibex:
   commit: e65a27e14dda7bb3b09cadc4e9232305fd451cec
   group: lowRISC
   domain: [soc]
 scm:
-  commit: v1.0.1
+#  commit: v1.0.1
+  commit: dift-ext
   group: jsailer
   domain: [cluster, soc]
 generic_FLL:
   commit: v0.1
   domain: [soc]
 tech_cells_generic:
-  commit: v0.1.6
+  #commit: v0.1.6
+  commit: dift-ext
   group: jsailer
   domain: [cluster, soc]
 udma/udma_core:
