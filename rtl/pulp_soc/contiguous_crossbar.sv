@@ -33,28 +33,28 @@ module contiguous_crossbar
       input logic                               clk_i,
       input logic                               rst_ni,
       input logic                               test_en_i,
-      XBAR_TCDM_BUS.Slave                       master_ports[NR_MASTER_PORTS],
-      XBAR_TCDM_BUS.Master                      slave_ports[NR_SLAVE_PORTS],
-      XBAR_TCDM_BUS.Master                      error_port,
+      XBAR_TCDM_BUS_36.Slave                    master_ports[NR_MASTER_PORTS],
+      XBAR_TCDM_BUS_36.Master                   slave_ports[NR_SLAVE_PORTS],
+      XBAR_TCDM_BUS_36.Master                   error_port,
       input addr_map_rule_t [NR_ADDR_RULES-1:0] addr_rules
     );
     // Do **not** change. The TCDM interface uses hardcoded bus widths so we cannot just change them here.
     localparam int unsigned BE_WIDTH = 4;
     localparam int unsigned ADDR_WIDTH = 32;
-    localparam int unsigned DATA_WIDTH = 32;
+    localparam int unsigned DATA_WIDTH = 36;
     localparam int unsigned NR_SLAVE_PORTS_INTERNAL = NR_SLAVE_PORTS+1; // We have one additional slave port for the
                                                                         // default error port
     localparam int unsigned PORT_SEL_WIDTH = $clog2(NR_SLAVE_PORTS_INTERNAL);
 
     // Explode the input interface array to arrays of individual signals
     //Master Ports
-    `TCDM_EXPLODE_ARRAY_DECLARE(master_ports, NR_MASTER_PORTS)
+    `TCDM_36_EXPLODE_ARRAY_DECLARE(master_ports, NR_MASTER_PORTS)
     for (genvar i = 0; i<NR_MASTER_PORTS; i++) begin : l2_demux_2_interleaved_xbar_explode
         `TCDM_MASTER_EXPLODE(master_ports[i], master_ports, [i])
     end // block: l2_demux_2_interleaved_xbar_explode
 
     //Slave ports explode. We need to declare one additional port for the error port
-    `TCDM_EXPLODE_ARRAY_DECLARE(slave_ports, NR_SLAVE_PORTS_INTERNAL)
+    `TCDM_36_EXPLODE_ARRAY_DECLARE(slave_ports, NR_SLAVE_PORTS_INTERNAL)
     for (genvar i = 0; i < NR_SLAVE_PORTS; i++) begin
         `TCDM_SLAVE_EXPLODE(slave_ports[i], slave_ports, [i])
     end

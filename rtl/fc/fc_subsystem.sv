@@ -28,8 +28,8 @@ module fc_subsystem #(
     input  logic                      rst_ni,
     input  logic                      test_en_i,
 
-    XBAR_TCDM_BUS.Master              l2_data_master,
-    XBAR_TCDM_BUS.Master              l2_instr_master,
+    XBAR_TCDM_BUS_36.Master           l2_data_master,
+    XBAR_TCDM_BUS_36.Master           l2_instr_master,
     XBAR_TCDM_BUS.Master              l2_hwpe_master [NB_HWPE_PORTS-1:0],
     APB_BUS.Slave                     apb_slave_eu,
     APB_BUS.Slave                     apb_slave_hwpe,
@@ -72,10 +72,12 @@ module fc_subsystem #(
 
     //Core Instr Bus
     logic [31:0] core_instr_addr, core_instr_rdata;
+    logic [ 3:0]                  core_instr_rtag;
     logic        core_instr_req, core_instr_gnt, core_instr_rvalid, core_instr_err;
 
     //Core Data Bus
     logic [31:0] core_data_addr, core_data_rdata, core_data_wdata;
+    logic [ 3:0]                 core_data_rtag,  core_data_wtag;
     logic        core_data_req, core_data_gnt, core_data_rvalid, core_data_err;
     logic        core_data_we  ;
     logic [ 3:0]  core_data_be ;
@@ -95,11 +97,28 @@ module fc_subsystem #(
     assign l2_data_master.req    = core_data_req;
     assign l2_data_master.add    = core_data_addr;
     assign l2_data_master.wen    = ~core_data_we;
-    assign l2_data_master.wdata  = core_data_wdata;
+    assign l2_data_master.wdata  = { core_data_wtag [    3],
+                                     core_data_wdata[31:24],
+                                     core_data_wtag [    2],
+                                     core_data_wdata[23:16],
+                                     core_data_wtag [    1],
+                                     core_data_wdata[15: 8],
+                                     core_data_wtag [    0],
+                                     core_data_wdata[ 7: 0]
+                                   };
     assign l2_data_master.be     = core_data_be;
     assign core_data_gnt         = l2_data_master.gnt;
     assign core_data_rvalid      = l2_data_master.r_valid;
-    assign core_data_rdata       = l2_data_master.r_rdata;
+    assign core_data_rdata       = { l2_data_master.r_rdata[34:27],
+                                     l2_data_master.r_rdata[25:18],
+                                     l2_data_master.r_rdata[16: 9],
+                                     l2_data_master.r_rdata[ 7: 0]
+                                   };
+    assign core_data_rtag        = { l2_data_master.r_rdata[35],
+                                     l2_data_master.r_rdata[26],
+                                     l2_data_master.r_rdata[17],
+                                     l2_data_master.r_rdata[ 8]
+                                   };
     assign core_data_err         = l2_data_master.r_opc;
 
 
@@ -110,7 +129,16 @@ module fc_subsystem #(
     assign l2_instr_master.be    = 4'b1111;
     assign core_instr_gnt        = l2_instr_master.gnt;
     assign core_instr_rvalid     = l2_instr_master.r_valid;
-    assign core_instr_rdata      = l2_instr_master.r_rdata;
+    assign core_instr_rdata      = { l2_instr_master.r_rdata[34:27],
+                                     l2_instr_master.r_rdata[25:18],
+                                     l2_instr_master.r_rdata[16: 9],
+                                     l2_instr_master.r_rdata[ 7: 0]
+                                   };
+    assign core_instr_rtag       = { l2_instr_master.r_rdata[35],
+                                     l2_instr_master.r_rdata[26],
+                                     l2_instr_master.r_rdata[17],
+                                     l2_instr_master.r_rdata[ 8]
+                                   };
     assign core_instr_err        = l2_instr_master.r_opc;
 
     //********************************************************
@@ -141,6 +169,7 @@ module fc_subsystem #(
         .instr_addr_o          ( core_instr_addr   ),
         .instr_req_o           ( core_instr_req    ),
         .instr_rdata_i         ( core_instr_rdata  ),
+        .instr_rtag_i          ( core_instr_rtag   ),
         .instr_gnt_i           ( core_instr_gnt    ),
         .instr_rvalid_i        ( core_instr_rvalid ),
 
@@ -149,9 +178,11 @@ module fc_subsystem #(
         .data_req_o            ( core_data_req     ),
         .data_be_o             ( core_data_be      ),
         .data_rdata_i          ( core_data_rdata   ),
+        .data_rtag_i           ( core_data_rtag    ),
         .data_we_o             ( core_data_we      ),
         .data_gnt_i            ( core_data_gnt     ),
         .data_wdata_o          ( core_data_wdata   ),
+        .data_wtag_o           ( core_data_wtag    ),
         .data_rvalid_i         ( core_data_rvalid  ),
 
         // apu-interconnect
@@ -219,6 +250,7 @@ module fc_subsystem #(
         .instr_addr_o          ( core_instr_addr   ),
         .instr_req_o           ( core_instr_req    ),
         .instr_rdata_i         ( core_instr_rdata  ),
+        .instr_rtag_i          ( core_instr_rtag   ),
         .instr_gnt_i           ( core_instr_gnt    ),
         .instr_rvalid_i        ( core_instr_rvalid ),
         .instr_err_i           ( core_instr_err    ),
@@ -228,9 +260,11 @@ module fc_subsystem #(
         .data_req_o            ( core_data_req     ),
         .data_be_o             ( core_data_be      ),
         .data_rdata_i          ( core_data_rdata   ),
+        .data_rtag_i           ( core_data_rtag    ),
         .data_we_o             ( core_data_we      ),
         .data_gnt_i            ( core_data_gnt     ),
         .data_wdata_o          ( core_data_wdata   ),
+        .data_wtag_o           ( core_data_wtag    ),
         .data_rvalid_i         ( core_data_rvalid  ),
         .data_err_i            ( core_data_err     ),
 

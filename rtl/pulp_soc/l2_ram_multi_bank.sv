@@ -11,14 +11,15 @@
 `include "soc_mem_map.svh"
 
 module l2_ram_multi_bank #(
-   parameter NB_BANKS                   = 4
+   parameter NB_BANKS                   = 4,
+   parameter BYTE_WIDTH                 = 8
 ) (
-   input logic             clk_i,
-   input logic             rst_ni,
-   input logic             init_ni,
-   input logic             test_mode_i,
-   XBAR_TCDM_BUS.Slave     mem_slave[NB_BANKS],
-   XBAR_TCDM_BUS.Slave     mem_pri_slave[2]
+   input logic              clk_i,
+   input logic              rst_ni,
+   input logic              init_ni,
+   input logic              test_mode_i,
+   XBAR_TCDM_BUS.Slave      mem_slave[NB_BANKS],
+   XBAR_TCDM_BUS.Slave      mem_pri_slave[2]
 );
     // Don't forget to adjust the SRAM macros and the FPGA settings if you change the banksizes
     localparam int unsigned BANK_SIZE_INTL_SRAM  = 32768; //Number of 32-bit words
@@ -56,9 +57,10 @@ module l2_ram_multi_bank #(
            that has been tape-out.
            */
           generic_memory #(
-                           .ADDR_WIDTH ( INTL_MEM_ADDR_WIDTH ),
-                           .DATA_WIDTH ( 32                  )
-                           ) bank_i (
+                                .ADDR_WIDTH ( INTL_MEM_ADDR_WIDTH ),
+                                .DATA_WIDTH ( 36                  ),
+                                .BYTE_WIDTH ( BYTE_WIDTH          )
+                                ) bank_i (
                                                .CLK   ( clk_i                                             ),
                                                .INITN ( 1'b1                                              ),
                                                .CEN   ( ~mem_slave[i].req                                 ),
@@ -101,8 +103,9 @@ module l2_ram_multi_bank #(
     assign pri0_address = mem_pri_slave[0].add - `SOC_MEM_MAP_PRIVATE_BANK0_START_ADDR;
    `ifndef PULP_FPGA_EMUL
     generic_memory #(
-      .ADDR_WIDTH ( PRI0_MEM_ADDR_WIDTH  ),
-      .DATA_WIDTH ( 32                  )
+      .ADDR_WIDTH ( PRI0_MEM_ADDR_WIDTH ),
+      .DATA_WIDTH ( 36                  ),
+      .BYTE_WIDTH ( BYTE_WIDTH          )
    ) bank_sram_pri0_i (
       .CLK   ( clk_i                                 ),
       .INITN ( 1'b1                                  ),
@@ -144,8 +147,9 @@ module l2_ram_multi_bank #(
     assign pri1_address = mem_pri_slave[1].add - `SOC_MEM_MAP_PRIVATE_BANK1_START_ADDR;
    `ifndef PULP_FPGA_EMUL
     generic_memory #(
-      .ADDR_WIDTH ( PRI1_MEM_ADDR_WIDTH  ),
-      .DATA_WIDTH ( 32                  )
+      .ADDR_WIDTH ( PRI1_MEM_ADDR_WIDTH ),
+      .DATA_WIDTH ( 36                  ),
+      .BYTE_WIDTH ( BYTE_WIDTH          )
    ) bank_sram_pri1_i (
       .CLK   ( clk_i                                 ),
       .INITN ( 1'b1                                  ),

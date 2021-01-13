@@ -21,9 +21,9 @@ common_cells:
   commit: v1.20.0
   domain: [cluster, soc]
 L2_tcdm_hybrid_interco:
-#  commit: pulpissimo-v1.0
-  commit: dift-ext
-  group: jsailer
+  commit: pulpissimo-v1.0
+#  commit: dift-ext
+#  group: jsailer
   domain: [soc]
 cluster_interconnect:
   commit: v1.1.0
@@ -83,9 +83,9 @@ ibex:
   group: lowRISC
   domain: [soc]
 scm:
-#  commit: v1.0.1
-  commit: dift-ext
-  group: jsailer
+  commit: v1.0.1
+#  commit: dift-ext
+#  group: jsailer
   domain: [cluster, soc]
 generic_FLL:
   commit: v0.1

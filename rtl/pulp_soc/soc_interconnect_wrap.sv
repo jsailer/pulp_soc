@@ -45,8 +45,8 @@ module soc_interconnect_wrap
        input logic clk_i,
        input logic rst_ni,
        input logic test_en_i,
-       XBAR_TCDM_BUS.Slave      tcdm_fc_data, //Data Port of the Fabric Controller
-       XBAR_TCDM_BUS.Slave      tcdm_fc_instr, //Instruction Port of the Fabric Controller
+       XBAR_TCDM_BUS_36.Slave   tcdm_fc_data, //Data Port of the Fabric Controller
+       XBAR_TCDM_BUS_36.Slave   tcdm_fc_instr, //Instruction Port of the Fabric Controller
        XBAR_TCDM_BUS.Slave      tcdm_udma_tx, //TX Channel for the uDMA
        XBAR_TCDM_BUS.Slave      tcdm_udma_rx, //RX Channel for the uDMA
        XBAR_TCDM_BUS.Slave      tcdm_debug, //Debug access port from either the legacy or the riscv-debug unit
@@ -54,8 +54,8 @@ module soc_interconnect_wrap
        AXI_BUS.Slave            axi_master_plug, // Normaly used for cluster -> SoC communication
        AXI_BUS.Master           axi_slave_plug, // Normaly used for SoC -> cluster communication
        APB_BUS.Master           apb_peripheral_bus, // Connects to all the SoC Peripherals
-       XBAR_TCDM_BUS.Master     l2_interleaved_slaves[NR_L2_PORTS], // Connects to the interleaved memory banks
-       XBAR_TCDM_BUS.Master     l2_private_slaves[2], // Connects to core-private memory banks
+       XBAR_TCDM_BUS_36.Master  l2_interleaved_slaves[NR_L2_PORTS], // Connects to the interleaved memory banks
+       XBAR_TCDM_BUS_36.Master  l2_private_slaves[2], // Connects to core-private memory banks
        XBAR_TCDM_BUS.Master     boot_rom_slave //Connects to the bootrom
      );
 
@@ -130,14 +130,21 @@ module soc_interconnect_wrap
 
     //Wiring signals to interconncet. Unfortunately Synopsys-2019.3 does not support assignment patterns in port lists
     //directly
-    XBAR_TCDM_BUS master_ports[pkg_soc_interconnect::NR_TCDM_MASTER_PORTS](); //increase the package localparma as well
+    XBAR_TCDM_BUS_36 master_ports[pkg_soc_interconnect::NR_TCDM_MASTER_PORTS](); //increase the package localparma as well
                                 //if you want to add new master ports. The parameter is used by other IPs to calcualte
                                 //the required AXI ID width.
     `TCDM_ASSIGN_INTF(master_ports[0], tcdm_fc_data)
     `TCDM_ASSIGN_INTF(master_ports[1], tcdm_fc_instr)
-    `TCDM_ASSIGN_INTF(master_ports[2], tcdm_udma_tx)
-    `TCDM_ASSIGN_INTF(master_ports[3], tcdm_udma_rx)
-    `TCDM_ASSIGN_INTF(master_ports[4], tcdm_debug)
+    //`TCDM_ASSIGN_INTF(master_ports[2], tcdm_udma_tx)
+    //`TCDM_ASSIGN_INTF(master_ports[3], tcdm_udma_rx)
+    //`TCDM_ASSIGN_INTF(master_ports[4], tcdm_debug)
+    tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE = 1'b1 )
+                              i_tcdm_bus_convert_tcdm_udma_tx( .slave_32(tcdm_udma_tx), .master_36(master_ports[2]) );
+    tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE = 1'b1 )
+                              i_tcdm_bus_convert_tcdm_udma_rx( .slave_32(tcdm_udma_rx), .master_36(master_ports[3]) );
+    tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE = 1'b0 )
+                              i_tcdm_bus_convert_tcdm_debug( .slave_32(tcdm_debug), .master_36(master_ports[4]) );
+    
 
     //Assign the 4 master ports from the AXI plug to the interface array
 
@@ -146,13 +153,23 @@ module soc_interconnect_wrap
     // E.g. assign a[param+i] = b[i] doesn't work, but assign a[i] = b[i-param] does.
     `define NR_SOC_TCDM_MASTER_PORTS 5
     for (genvar i = 0; i < 4; i++) begin
-        `TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS + i], axi_bridge_2_interconnect[i])
+        //`TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS + i], axi_bridge_2_interconnect[i])
+        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE = 1'b1 )
+                                  i_tcdm_bus_convert_axi_bridge_2_interconnect( .slave_32(axi_bridge_2_interconnect[i]),
+                                                                                .master_36(master_ports[`NR_SOC_TCDM_MASTER_PORTS + i]) );
+    end
+    
+    XBAR_TCDM_BUS_36 master_ports_interleaved_only [NR_HWPE_PORTS]();
+    for (genvar i = 0; i < NR_HWPE_PORTS; i++) begin
+        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE = 1'b1 )
+                                  i_tcdm_bus_convert_tcdm_hwpe( .slave_32(tcdm_hwpe[i]), .master_36(master_ports_interleaved_only[i]) );
     end
 
-    XBAR_TCDM_BUS contiguous_slaves[3]();
+    XBAR_TCDM_BUS_36 contiguous_slaves[3]();
     `TCDM_ASSIGN_INTF(l2_private_slaves[0], contiguous_slaves[0])
     `TCDM_ASSIGN_INTF(l2_private_slaves[1], contiguous_slaves[1])
-    `TCDM_ASSIGN_INTF(boot_rom_slave, contiguous_slaves[2])
+    //`TCDM_ASSIGN_INTF(boot_rom_slave, contiguous_slaves[2])
+    tcdm_bus_convert_36_to_32 #( .TAG_BITS_READ_VALUE = 1'b0 ) i_tcdm_bus_convert_boot_rom_slave( .slave_36(boot_rom_slave), .master_32(contiguous_slaves[2]) );
 
     AXI_BUS #(.AXI_ADDR_WIDTH(32),
               .AXI_DATA_WIDTH(32),
@@ -185,7 +202,7 @@ module soc_interconnect_wrap
                                              .rst_ni,
                                              .test_en_i,
                                              .master_ports(master_ports),
-                                             .master_ports_interleaved_only(tcdm_hwpe),
+                                             .master_ports_interleaved_only(master_ports_interleaved_only),
                                              .addr_space_l2_demux(L2_DEMUX_RULES),
                                              .addr_space_interleaved(INTERLEAVED_ADDR_SPACE),
                                              .interleaved_slaves(l2_interleaved_slaves),

@@ -434,17 +434,17 @@ module pulp_soc import dm::*; #(
 
     XBAR_TCDM_BUS s_mem_rom_bus ();
 
-    XBAR_TCDM_BUS  s_mem_l2_bus[NB_L2_BANKS-1:0]();
-    XBAR_TCDM_BUS  s_mem_l2_pri_bus[NB_L2_BANKS_PRI-1:0]();
+    XBAR_TCDM_BUS_36    s_mem_l2_bus[NB_L2_BANKS-1:0]();
+    XBAR_TCDM_BUS_36    s_mem_l2_pri_bus[NB_L2_BANKS_PRI-1:0]();
 
-    XBAR_TCDM_BUS s_lint_debug_bus();
-    XBAR_TCDM_BUS s_lint_pulp_jtag_bus();
-    XBAR_TCDM_BUS s_lint_riscv_jtag_bus();
-    XBAR_TCDM_BUS s_lint_udma_tx_bus ();
-    XBAR_TCDM_BUS s_lint_udma_rx_bus ();
-    XBAR_TCDM_BUS s_lint_fc_data_bus ();
-    XBAR_TCDM_BUS s_lint_fc_instr_bus ();
-    XBAR_TCDM_BUS s_lint_hwpe_bus[NB_HWPE_PORTS-1:0]();
+    XBAR_TCDM_BUS       s_lint_debug_bus();
+    XBAR_TCDM_BUS       s_lint_pulp_jtag_bus();
+    XBAR_TCDM_BUS       s_lint_riscv_jtag_bus();
+    XBAR_TCDM_BUS       s_lint_udma_tx_bus ();
+    XBAR_TCDM_BUS       s_lint_udma_rx_bus ();
+    XBAR_TCDM_BUS_36    s_lint_fc_data_bus ();
+    XBAR_TCDM_BUS_36    s_lint_fc_instr_bus ();
+    XBAR_TCDM_BUS       s_lint_hwpe_bus[NB_HWPE_PORTS-1:0]();
 
     `ifdef REMAP_ADDRESS
         logic [3:0] base_addr_int;
@@ -507,7 +507,8 @@ module pulp_soc import dm::*; #(
     //********************************************************
 
     l2_ram_multi_bank #(
-        .NB_BANKS              ( NB_L2_BANKS )
+        .NB_BANKS              ( NB_L2_BANKS ),
+        .BYTE_WIDTH            ( 9           )
     ) l2_ram_i (
         .clk_i           ( s_soc_clk          ),
         .rst_ni          ( s_soc_rstn         ),
