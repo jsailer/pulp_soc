@@ -93,7 +93,7 @@ module soc_interconnect
         XBAR_TCDM_BUS_36 demux_slaves[3]();
 
         //`TCDM_ASSIGN_INTF(l2_demux_2_axi_bridge[i], demux_slaves[0]);
-        tcdm_bus_convert_36_to_32 #( .TAG_BITS_READ_VALUE = 1'b1 ) i_tcdm_bus_convert_l2_demux_2_axi_bridge( .slave_36(demux_slaves[0]), .master_32(l2_demux_2_axi_bridge[i]) );
+        tcdm_bus_convert_36_to_32 #( .TAG_BITS_READ_VALUE(1'b1) ) i_tcdm_bus_convert_l2_demux_2_axi_bridge( .slave_36(demux_slaves[0]), .master_32(l2_demux_2_axi_bridge[i]) );
         `TCDM_ASSIGN_INTF(l2_demux_2_contiguous_xbar[i], demux_slaves[1]);
         `TCDM_ASSIGN_INTF(l2_demux_2_interleaved_xbar[i], demux_slaves[2]);
 
