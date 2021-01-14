@@ -59,6 +59,8 @@ components:
     rtl/components/apb_soc_ctrl.sv,
     rtl/components/memory_models.sv,
     rtl/components/pulp_interfaces.sv,
+    rtl/components/tcdm_bus_convert_32_to_36.sv,
+    rtl/components/tcdm_bus_convert_36_to_32.sv,
     rtl/components/glitch_free_clk_mux.sv,
     rtl/components/scm_2048x32.sv,
     rtl/components/scm_512x32.sv,
