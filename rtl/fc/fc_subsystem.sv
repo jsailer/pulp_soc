@@ -174,7 +174,7 @@ module fc_subsystem #(
         .instr_addr_o          ( core_instr_addr   ),
         .instr_req_o           ( core_instr_req    ),
         .instr_rdata_i         ( core_instr_rdata  ),
-        //.instr_rtag_i          ( core_instr_rtag   ),
+        .instr_rtag_i          ( core_instr_rtag   ),
         .instr_gnt_i           ( core_instr_gnt    ),
         .instr_rvalid_i        ( core_instr_rvalid ),
 
@@ -183,11 +183,11 @@ module fc_subsystem #(
         .data_req_o            ( core_data_req     ),
         .data_be_o             ( core_data_be      ),
         .data_rdata_i          ( core_data_rdata   ),
-        //.data_rtag_i           ( core_data_rtag    ),
+        .data_rtag_i           ( core_data_rtag    ),
         .data_we_o             ( core_data_we      ),
         .data_gnt_i            ( core_data_gnt     ),
         .data_wdata_o          ( core_data_wdata   ),
-        //.data_wtag_o           ( core_data_wtag    ),
+        .data_wtag_o           ( core_data_wtag    ),
         .data_rvalid_i         ( core_data_rvalid  ),
 
         // apu-interconnect
