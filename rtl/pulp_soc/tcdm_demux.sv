@@ -42,7 +42,7 @@ module tcdm_demux
     localparam int unsigned DATA_WIDTH = 32;
 
     // Explode the output interfaces to  individual signals
-    `TCDM_EXPLODE_ARRAY_DECLARE(slave_ports, NR_OUTPUTS)
+    `TCDM_36_EXPLODE_ARRAY_DECLARE(slave_ports, NR_OUTPUTS)
     for (genvar i = 0; i < NR_OUTPUTS; i++) begin
         `TCDM_SLAVE_EXPLODE(slave_ports[i], slave_ports, [i])
     end

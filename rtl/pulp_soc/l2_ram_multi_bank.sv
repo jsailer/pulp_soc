@@ -18,8 +18,8 @@ module l2_ram_multi_bank #(
    input logic              rst_ni,
    input logic              init_ni,
    input logic              test_mode_i,
-   XBAR_TCDM_BUS.Slave      mem_slave[NB_BANKS],
-   XBAR_TCDM_BUS.Slave      mem_pri_slave[2]
+   XBAR_TCDM_BUS_36.Slave   mem_slave[NB_BANKS],
+   XBAR_TCDM_BUS_36.Slave   mem_pri_slave[2]
 );
     // Don't forget to adjust the SRAM macros and the FPGA settings if you change the banksizes
     localparam int unsigned BANK_SIZE_INTL_SRAM  = 32768; //Number of 32-bit words

@@ -29,9 +29,9 @@ module tcdm_bus_convert_32_to_36 #(
     assign slave_32.gnt     = master_36.gnt;
     assign slave_32.r_opc   = master_36.r_opc;
     assign slave_32.r_valid = master_36.r_valid;
-    assign slave_32.r_data[ 7: 0] = master_36.r_data[ 7: 0];
-    assign slave_32.r_data[15: 8] = master_36.r_data[16: 9];
-    assign slave_32.r_data[23:16] = master_36.r_data[25:18];
-    assign slave_32.r_data[31:24] = master_36.r_data[34:27];
+    assign slave_32.r_rdata[ 7: 0] = master_36.r_rdata[ 7: 0];
+    assign slave_32.r_rdata[15: 8] = master_36.r_rdata[16: 9];
+    assign slave_32.r_rdata[23:16] = master_36.r_rdata[25:18];
+    assign slave_32.r_rdata[31:24] = master_36.r_rdata[34:27];
 
 endmodule

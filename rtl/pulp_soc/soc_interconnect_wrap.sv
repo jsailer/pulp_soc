@@ -154,7 +154,7 @@ module soc_interconnect_wrap
     `define NR_SOC_TCDM_MASTER_PORTS 5
     for (genvar i = 0; i < 4; i++) begin
         //`TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS + i], axi_bridge_2_interconnect[i])
-        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b1) 
+        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b1) )
                                   i_tcdm_bus_convert_axi_bridge_2_interconnect( .slave_32(axi_bridge_2_interconnect[i]),
                                                                                 .master_36(master_ports[`NR_SOC_TCDM_MASTER_PORTS + i]) );
     end
@@ -169,7 +169,7 @@ module soc_interconnect_wrap
     `TCDM_ASSIGN_INTF(l2_private_slaves[0], contiguous_slaves[0])
     `TCDM_ASSIGN_INTF(l2_private_slaves[1], contiguous_slaves[1])
     //`TCDM_ASSIGN_INTF(boot_rom_slave, contiguous_slaves[2])
-    tcdm_bus_convert_36_to_32 #( .TAG_BITS_READ_VALUE(1'b0) ) i_tcdm_bus_convert_boot_rom_slave( .slave_36(boot_rom_slave), .master_32(contiguous_slaves[2]) );
+    tcdm_bus_convert_36_to_32 #( .TAG_BITS_READ_VALUE(1'b0) ) i_tcdm_bus_convert_boot_rom_slave( .slave_36(contiguous_slaves[2]), .master_32(boot_rom_slave) );
 
     AXI_BUS #(.AXI_ADDR_WIDTH(32),
               .AXI_DATA_WIDTH(32),
